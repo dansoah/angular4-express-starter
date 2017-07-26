@@ -12,7 +12,7 @@ export function verifyToken(token) {
         jwt.verify( token,
                     secret,
                     (err, decodedToken) =>  err || !decodedToken
-                                                        ? return reject(err)
+                                                        ? reject(err)
                                                         : resolve(decodedToken)
                   );
     });
@@ -34,10 +34,12 @@ export function createToken(details) {
                                     Object.assign(obj,details.sessionData[key]);
                                 })
 
-    const token = jwt.sign({ data: details.sessionData },
-                             secret,
-                             expiresIn: details.maxAge,
-                             algorithm: 'HS256'
+    const token = jwt.sign( { data: details.sessionData },
+                            secret,
+                            {
+                                expiresIn: details.maxAge,
+                                algorithm: 'HS256'
+                            }
                          );
 
     return token;
