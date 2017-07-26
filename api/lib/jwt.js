@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-const secret = process.env.JWT_SECRET;
+const secret = "asdasdasdasd";
 
 /**
  * Validates if a token is a valid JWT token
@@ -32,7 +32,8 @@ export function createToken(details) {
                                         return obj;
 
                                     Object.assign(obj,details.sessionData[key]);
-                                })
+                                    return details.sessionData;
+                                }, {})
 
     const token = jwt.sign( { data: details.sessionData },
                             secret,
