@@ -15,17 +15,25 @@ router.get('/teste', jwtValidate, (req,res) => {
 
 router.post('/authenticate', (req,res) => {
     let { email, password } = req.body;
-    const closeTheDoor = res
-                            .status(401)
-                            .send
-                            .bind(res, {
-                                status: 401,
-                                message: 'Wrong email/password'
-                            });
 
+    const closeTheDoor = () => {
+        res
+            .status(401)
+            .send({
+                status: 401,
+                message: 'Wrong email/password'
+            });
+
+        }
     authenticate(email,password).then( userInfo => {
+
+        if(userInfo === false){
+            return closeTheDoor();
+        }
+
         let token = createToken({sessionData: userInfo});
-        res.send({status:200, data:token})
+        return res.send({status:200, data:token})
+        
     }, () => {
         closeTheDoor()
     })
