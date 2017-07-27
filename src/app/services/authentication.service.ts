@@ -9,7 +9,7 @@ export class AuthenticationService {
 
     constructor(private http: Http) {
         // set token if saved in local storage
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const currentUser = JSON.parse(localStorage.getItem('authentication'));
         this.token = currentUser && currentUser.token;
     }
 
@@ -18,19 +18,17 @@ export class AuthenticationService {
         const token = { email: email, password: password };
         return this.http.post('/api/authenticate', token)
             .map((response: Response) => {
-                // login successful if there's a jwt token in the response
-                let token = response.json() && response.json().token;
-                if (token) {
-                    // set token property
-                    this.token = token;
 
-                    // store email and jwt token in local storage to keep user logged in between page refreshes
-                    localStorage.setItem('currentUser', JSON.stringify({ email: email, token: token }));
+                let jwt = !!response.json() ? response.json().data : null;
 
-                    // return true to indicate successful login
+                if (jwt != null) {
+                    this.token = jwt;
+                    localStorage.setItem('authentication', JSON.stringify({
+                        email: email,
+                        token: this.token
+                    }));
                     return true;
                 } else {
-                    // return false to indicate failed login
                     return false;
                 }
             });
@@ -39,6 +37,6 @@ export class AuthenticationService {
     logout(): void {
         // clear token remove user from local storage to log user out
         this.token = null;
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem('authentication');
     }
 }
